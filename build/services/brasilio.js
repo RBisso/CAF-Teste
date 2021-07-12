@@ -68,17 +68,3 @@ var consultBrasilIo = function (cnpj, url) { return __awaiter(void 0, void 0, vo
 exports.default = {
     consultBrasilIo: consultBrasilIo
 };
-//writeDb(response.data);
-/**
- * type Company = {
-    cnpj: string
-    razao_social: string,
-    uf: string,
-    qsa: [{
-        cpf_cnpj_socio: string,
-        nome_socio: string,
-        qualificacao_socio: string,
-        tipo_socio: string,
-    }]
-};
- */ 

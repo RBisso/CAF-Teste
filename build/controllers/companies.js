@@ -39,55 +39,148 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var mongoose_1 = __importDefault(require("mongoose"));
 var company_1 = __importDefault(require("../models/company"));
 var defaults_1 = __importDefault(require("../config/defaults"));
 var logger_1 = __importDefault(require("../logger"));
 var brasilio_1 = __importDefault(require("../services/brasilio"));
-var createCompany = function (comp, part) { return __awaiter(void 0, void 0, void 0, function () {
+var createCompany = function (comp) { return __awaiter(void 0, void 0, void 0, function () {
+    var company, code;
     return __generator(this, function (_a) {
-        logger_1.default.info(comp);
-        logger_1.default.info(part);
-        return [2 /*return*/];
+        switch (_a.label) {
+            case 0:
+                company = new company_1.default({
+                    _id: new mongoose_1.default.Types.ObjectId(),
+                    cnpj: comp.cnpj,
+                    razao_social: comp.razao_social,
+                    uf: comp.uf,
+                    qsa: comp.qsa
+                });
+                return [4 /*yield*/, company.save()
+                        .then(function () {
+                        return 200;
+                    })
+                        .catch(function (error) {
+                        logger_1.default.info(error);
+                        return 500;
+                    })];
+            case 1:
+                code = _a.sent();
+                return [2 /*return*/, code];
+        }
+    });
+}); };
+var updateCompany = function (comp, cnpj) { return __awaiter(void 0, void 0, void 0, function () {
+    var code;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, company_1.default.findOneAndUpdate({ cnpj: cnpj }, comp, { new: true })
+                    .then(function () {
+                    return 200;
+                })
+                    .catch(function (error) {
+                    logger_1.default.info(error);
+                    return 500;
+                })];
+            case 1:
+                code = _a.sent();
+                return [2 /*return*/, code];
+        }
+    });
+}); };
+var formatData = function (comp, part) {
+    part.forEach(function (elem) {
+        delete elem.cnpj;
+        delete elem.razao_social;
+    });
+    comp.qsa = part;
+    return comp;
+};
+var consultBrasilIo = function (cnpj) { return __awaiter(void 0, void 0, void 0, function () {
+    var company, partners, formatedCompany;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, brasilio_1.default.consultBrasilIo(cnpj, defaults_1.default.url_company_brasilio)];
+            case 1:
+                company = (_a.sent())[0];
+                return [4 /*yield*/, brasilio_1.default.consultBrasilIo(cnpj, defaults_1.default.url_partners_brasilio)];
+            case 2:
+                partners = _a.sent();
+                formatedCompany = formatData(company, partners);
+                return [2 /*return*/, formatedCompany];
+        }
     });
 }); };
 var getCompany = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var company, statusCode;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, company_1.default.find()
-                    .exec()
-                    .then(function (result) { return __awaiter(void 0, void 0, void 0, function () {
-                    var company, partners, c;
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0:
-                                if (!result.length) return [3 /*break*/, 1];
-                                return [2 /*return*/, res.status(200).json({
-                                        company: result
-                                    })];
-                            case 1: return [4 /*yield*/, brasilio_1.default.consultBrasilIo(req.body.cnpj, defaults_1.default.url_company_brasilio)];
-                            case 2:
-                                company = _a.sent();
-                                return [4 /*yield*/, brasilio_1.default.consultBrasilIo(req.body.cnpj, defaults_1.default.url_partners_brasilio)];
-                            case 3:
-                                partners = _a.sent();
-                                c = company[0];
-                                console.log(c.cnpj);
-                                _a.label = 4;
-                            case 4: return [2 /*return*/, res.status(200).json({
-                                    message: 'success'
-                                })];
-                        }
-                    });
-                }); })
-                    .catch(function (error) {
-                    return res.status(500).json({
-                        message: error.message,
-                        error: error
-                    });
-                })];
+            case 0:
+                if (!(req.body.tipo == 'cacheado')) return [3 /*break*/, 2];
+                return [4 /*yield*/, company_1.default.findOne({ cnpj: req.body.cnpj })
+                        .exec()
+                        .then(function (result) { return __awaiter(void 0, void 0, void 0, function () {
+                        var company, statusCode;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    if (!result) return [3 /*break*/, 1];
+                                    return [2 /*return*/, res.status(200).json({
+                                            empresa: result
+                                        })];
+                                case 1: return [4 /*yield*/, consultBrasilIo(req.body.cnpj)];
+                                case 2:
+                                    company = _a.sent();
+                                    return [4 /*yield*/, createCompany(company)];
+                                case 3:
+                                    statusCode = _a.sent();
+                                    if (statusCode == 200) {
+                                        return [2 /*return*/, res.status(200).json({
+                                                empresa: company
+                                            })];
+                                    }
+                                    else {
+                                        return [2 /*return*/, res.status(500).json({
+                                                mensagem: 'Internal error'
+                                            })];
+                                    }
+                                    _a.label = 4;
+                                case 4: return [2 /*return*/];
+                            }
+                        });
+                    }); })
+                        .catch(function (error) {
+                        return res.status(500).json({
+                            message: error.message,
+                            error: error
+                        });
+                    })];
             case 1:
                 _a.sent();
-                return [2 /*return*/];
+                return [3 /*break*/, 6];
+            case 2:
+                if (!(req.body.tipo == 'tempo_real')) return [3 /*break*/, 5];
+                return [4 /*yield*/, consultBrasilIo(req.body.cnpj)];
+            case 3:
+                company = _a.sent();
+                return [4 /*yield*/, updateCompany(company, req.body.cnpj)];
+            case 4:
+                statusCode = _a.sent();
+                if (statusCode == 200) {
+                    return [2 /*return*/, res.status(200).json({
+                            empresa: company
+                        })];
+                }
+                else {
+                    return [2 /*return*/, res.status(500).json({
+                            mensagem: 'Internal error'
+                        })];
+                }
+                return [3 /*break*/, 6];
+            case 5: return [2 /*return*/, res.status(400).json({
+                    mensagem: "Bad Request"
+                })];
+            case 6: return [2 /*return*/];
         }
     });
 }); };

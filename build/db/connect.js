@@ -55,6 +55,7 @@ var connect = function () { return __awaiter(void 0, void 0, void 0, function ()
                         .connect(dbUri, {
                         useNewUrlParser: true,
                         useUnifiedTopology: true,
+                        useFindAndModify: false,
                     })
                         .then(function () {
                         logger_1.default.info("Databse connected");

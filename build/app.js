@@ -9,7 +9,7 @@ var logger_1 = __importDefault(require("./logger"));
 var connect_1 = __importDefault(require("./db/connect"));
 var routes_1 = __importDefault(require("./routes/routes"));
 var port = defaults_1.default.port;
-var host = defaults_1.default.host;
+var host = ''; //config.host
 var app = express_1.default();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));

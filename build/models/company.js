@@ -24,11 +24,6 @@ var CompanySchema = new mongoose_1.Schema({
     cnpj: { type: String, required: true },
     razao_social: { type: String, required: true },
     uf: { type: String, required: true },
-    qsa: [{
-            cpf_cnpj_socio: { type: String },
-            nome_socio: { type: String },
-            qualificacao_socio: { type: String },
-            tipo_socio: { type: String },
-        }]
+    qsa: []
 });
 exports.default = mongoose_1.default.model('Company', CompanySchema);

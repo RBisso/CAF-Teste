@@ -70,7 +70,6 @@ const consultBrasilIo = async (cnpj: string) => {
 const getCompany = async (req: Request, res: Response, next: NextFunction) => {
 
     if ( req.body.tipo == 'cacheado') {
-        log.info('chacheado')
         await Company.findOne({ cnpj: req.body.cnpj })
         .exec()
         .then(async (result) => {
@@ -100,7 +99,6 @@ const getCompany = async (req: Request, res: Response, next: NextFunction) => {
             });
         });
     } else if ( req.body.tipo == 'tempo_real') {
-        log.info('tempo_real')
         const company = await consultBrasilIo(req.body.cnpj)
         const statusCode: number = await updateCompany(company, req.body.cnpj)
                

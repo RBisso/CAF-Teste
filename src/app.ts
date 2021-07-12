@@ -5,7 +5,7 @@ import connect from './db/connect';
 import routes from './routes/routes';
 
 const port = config.port
-const host = config.host
+const host = '' //config.host
 
 const app = express();
 
