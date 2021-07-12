@@ -22,3 +22,8 @@ Scripts de execução:
 
 Rotas: /api/v1/companies
 
+# Docker:
+
+docker hub hepo: https://hub.docker.com/repository/docker/bissorm/caf-teste
+
+``` docker run -it <port>:1337 caf-teste```
