@@ -26,4 +26,4 @@ Rotas: /api/v1/companies
 
 docker hub hepo: https://hub.docker.com/repository/docker/bissorm/caf-teste
 
-``` docker run -it <port>:1337 caf-teste```
+``` docker run -it -p <port>:1337 caf-teste```
