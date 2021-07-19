@@ -100,7 +100,16 @@ const getCompany = async (req: Request, res: Response, next: NextFunction) => {
         });
     } else if ( req.body.tipo == 'tempo_real') {
         const company = await consultBrasilIo(req.body.cnpj)
-        const statusCode: number = await updateCompany(company, req.body.cnpj)
+
+        let statusCode: number = 0;
+        if ( await Company.exists({ cnpj: req.body.cnpj })){
+            log.info('Company exists')
+            statusCode = await updateCompany(company, req.body.cnpj)
+        } else {
+            log.info('Company doesnt exists')
+            statusCode = await createCompany(company)
+        }
+        
                
         if (statusCode == 200){
             return res.status(200).json({

@@ -157,15 +157,28 @@ var getCompany = function (req, res, next) { return __awaiter(void 0, void 0, vo
                     })];
             case 1:
                 _a.sent();
-                return [3 /*break*/, 6];
+                return [3 /*break*/, 10];
             case 2:
-                if (!(req.body.tipo == 'tempo_real')) return [3 /*break*/, 5];
+                if (!(req.body.tipo == 'tempo_real')) return [3 /*break*/, 9];
                 return [4 /*yield*/, consultBrasilIo(req.body.cnpj)];
             case 3:
                 company = _a.sent();
-                return [4 /*yield*/, updateCompany(company, req.body.cnpj)];
+                statusCode = 0;
+                return [4 /*yield*/, company_1.default.exists({ cnpj: req.body.cnpj })];
             case 4:
+                if (!_a.sent()) return [3 /*break*/, 6];
+                logger_1.default.info('Company exists');
+                return [4 /*yield*/, updateCompany(company, req.body.cnpj)];
+            case 5:
                 statusCode = _a.sent();
+                return [3 /*break*/, 8];
+            case 6:
+                logger_1.default.info('Company doesnt exists');
+                return [4 /*yield*/, createCompany(company)];
+            case 7:
+                statusCode = _a.sent();
+                _a.label = 8;
+            case 8:
                 if (statusCode == 200) {
                     return [2 /*return*/, res.status(200).json({
                             empresa: company
@@ -176,11 +189,11 @@ var getCompany = function (req, res, next) { return __awaiter(void 0, void 0, vo
                             mensagem: 'Internal error'
                         })];
                 }
-                return [3 /*break*/, 6];
-            case 5: return [2 /*return*/, res.status(400).json({
+                return [3 /*break*/, 10];
+            case 9: return [2 /*return*/, res.status(400).json({
                     mensagem: "Bad Request"
                 })];
-            case 6: return [2 /*return*/];
+            case 10: return [2 /*return*/];
         }
     });
 }); };
